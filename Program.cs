@@ -10,6 +10,12 @@ using Microsoft.OpenApi.Models;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 
+var jwtSettings = builder.Configuration.GetSection("Jwt");
+
+var keyString = jwtSettings["Key"] ?? "default_key_value";
+
+var key = Encoding.UTF8.GetBytes(keyString);
+
 builder.Services.AddAuthentication("Bearer")
 .AddJwtBearer("Bearer", options =>
 {
@@ -20,8 +26,8 @@ builder.Services.AddAuthentication("Bearer")
         ValidateAudience = false,
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes("ÇokDahaUzunVeGüvenliBirAnahtarBurayaÇokDahaUzunVeGüvenliBirAnahtarBuraya"))
+        IssuerSigningKey = new SymmetricSecurityKey(key)
+
     };
 });
 
