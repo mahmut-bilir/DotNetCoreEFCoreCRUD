@@ -28,7 +28,7 @@ public class SecureController : ControllerBase
     }
 
     [HttpPost("login")]
-    public IActionResult Login(string username, string password)
+    public IActionResult Login([FromServices] IConfiguration configuration, string username, string password)
     {
 
         // Normally here you should  check the user from the database.
@@ -40,14 +40,14 @@ public class SecureController : ControllerBase
                 new Claim(ClaimTypes.Role, "Admin")
             };
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("ÇokDahaUzunVeGüvenliBirAnahtarBurayaÇokDahaUzunVeGüvenliBirAnahtarBuraya"));
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Key"] ?? "default_key_value"));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
 
             var token = new JwtSecurityToken(
 
                     claims: claims,
-                    expires: DateTime.Now.AddMinutes(30),
+                    expires: DateTime.Now.AddMinutes(configuration["Jwt:ExpireMinutes"] != null ? Convert.ToDouble(configuration["Jwt:ExpireMinutes"]) : 30),
                     signingCredentials: creds
 
             );
